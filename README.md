@@ -87,3 +87,50 @@ public function boot(): void
 
 This setting will help us to see N+1 problem - an error will occur:
 *Attempted to lazy load [employer] on model [App\Models\Job] but lazy loading is disabled.*
+
+## 14. All You Need to Know About Pagination
+
+We can add pagination:
+
+```php
+$jobs = Job::with('employer')->paginate(3);
+```
+
+We can display page 2: http://example.test/jobs?page=2
+
+To display pagination menu in the template: `{{ $jobs->links() }}`
+
+It looks great because Laravel thinks that you're using Tailwind by default.
+
+To copy templates for pagination from vendor to app: 
+
+```
+php artisan vendor:publish
+```
+Select `laravel-pagination` tag.
+It will copy files to `resources/views/vendor/pagination`.
+
+Also Laravel supports https://semantic-ui.com/ .
+
+To enable Bootstrap 5 for pagination, edit `app/Providers/AppServiceProvider.php`:
+
+```php
+    public function boot(): void
+    {
+        Paginator::useBootstrapFive();
+    }
+```
+
+To enable simple pagination with Next, Previous buttons:
+
+```php
+$jobs = Job::with('employer')->simplePaginate(3);
+```
+
+To enable cursor pagination with Next, Previous buttons and strange links like 
+this http://example.test/jobs?cursor=eyJqb2JfbGlzdGluZ3MuaWQiOjMsIl9wb2ludHNUb05leHRJdGVtcyI6dHJ1ZX0 :
+
+```php
+$jobs = Job::with('employer')->cursorPaginate(3);
+```
+
