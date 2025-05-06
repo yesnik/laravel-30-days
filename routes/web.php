@@ -8,8 +8,11 @@ Route::get('/', action: function () {
 });
 
 Route::get('/jobs', function () {
+    $jobs = Job::with('employer')->get();
+    // $jobs = Job::all();
+
     return view('jobs', [
-        'jobs' => Job::all(),
+        'jobs' => $jobs,
     ]);
 });
 

@@ -60,3 +60,30 @@ Get titles of selected jobs:
 ```php
 $tag->jobs()->get()->pluck('title');
 ```
+
+## 13. Eager Loading and the N+1 Problem
+
+To see N+1 problem install Laravel DebugBar:
+
+```
+composer require barryvdh/laravel-debugbar --dev
+```
+Visit http://example.test/jobs and see many SQL queries at the Debug bar.
+
+To solve N+1 add eager loading at `routes/web.php`:
+
+```php
+$jobs = Job::with('employer')->get();
+```
+
+We can disable lazy loading in the app, file `app/Providers/AppServiceProvider.php`:
+
+```php
+public function boot(): void
+{
+    Model::preventLazyLoading();
+}
+```
+
+This setting will help us to see N+1 problem - an error will occur:
+*Attempted to lazy load [employer] on model [App\Models\Job] but lazy loading is disabled.*
