@@ -134,3 +134,42 @@ this http://example.test/jobs?cursor=eyJqb2JfbGlzdGluZ3MuaWQiOjMsIl9wb2ludHNUb05
 $jobs = Job::with('employer')->cursorPaginate(3);
 ```
 
+## 15. Understanding Database Seeders
+
+Drop database and apply all migrations with seeds:
+
+```
+php artisan migrate:fresh --seed
+```
+
+Apply seeds to DB: `php artisan db:seed`
+
+Add seeder to `database\seeders\DatabaseSeeder.php`:
+
+```php
+Job::factory(200)->create();
+```
+
+We can make a new seeder: `php artisan make:seeder` and define `JobSeeder`:
+
+```php
+class JobSeeder extends Seeder
+{
+    public function run(): void
+    {
+        Job::factory(200)->create();
+    }
+}
+```
+After this we can call this seeder at `database\seeders\DatabaseSeeder.php`:
+
+```php
+$this->call(JobSeeder::class);
+```
+
+We can seed DB only with one seeder: 
+
+```
+php artisan db:seed --class=JobSeeder
+```
+
