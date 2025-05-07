@@ -173,3 +173,71 @@ We can seed DB only with one seeder:
 php artisan db:seed --class=JobSeeder
 ```
 
+## 16. Forms and CSRF Explained (with Examples)
+
+Order of routes at `routes/web.php` matters. You should define routes from specific to general:
+
+- '/jobs/create'
+- '/jobs/{id}'
+
+Move job's templates to one folder:
+
+- `/resources/view/jobs/index.blade.php` - display list of jobs
+- `/resources/view/jobs/show.blade.php` - display a single job
+- `/resources/view/jobs/create.blade.php` - create a single job
+
+We can use this template in the `web.php`:
+
+```php
+Route::get('/contact', function () {
+    return view('contact');
+});
+```
+
+Form Layouts: https://tailwindcss.com/plus/ui-blocks/application-ui/forms/form-layouts
+
+Add CSRF token to form:
+
+```html
+<form method="POST" action="/jobs">
+  @csrf
+</form>
+```
+
+This will create a hidden input in the form:
+
+```html
+<input type="hidden" name="_token" value="GDA2nUT6OJCEGAlKTdi3CDxhCyB0ktU3Kw70GH3t" autocomplete="off">
+```
+
+We can get all submitted data:
+
+```php
+Route::post('/jobs', function() {
+    dd(request()->all());
+});
+```
+
+Get submitted value of "title": `request('title')`
+
+Order by created_at in DESC order:
+
+```php
+$jobs = Job::with('employer')->latest()->simplePaginate(3);
+```
+
+To disable fillable feature add this property to `Job` model:
+
+```php
+protected $guarded = []; 
+```
+
+To remove mass asigment protection - `app/Providers/AppServiceProvider.php`
+
+```php
+public function boot(): void
+{
+    Model::unguard();
+}
+```
+
