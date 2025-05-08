@@ -241,3 +241,33 @@ public function boot(): void
 }
 ```
 
+## 17. Always Validate. Never Trust the User
+
+We can create component `resources\views\Components\button.blade.php`:
+
+```php
+<a {{ $attributes->merge(['class' => 'relative inline-flex items-center px-2 py-2 -ml-px text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md leading-5 hover:text-gray-400 focus:z-10 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:active:bg-gray-700 dark:focus:border-blue-800']) }}>{{ $slot }}</a>
+```
+
+Use it at layout file:
+
+```php
+<x-button href="/jobs/create">Create Job</x-button> 
+```
+
+Add validation rules to `routes/web.php`:
+
+```php
+    request()->validate([
+        'title' => ['required', 'min:3'],
+        'salary' => ['required'],
+    ]);
+```
+
+Display validation message for a field:
+
+```php
+@error('title')
+    <p class="text-xs text-red-500 font-semibold mt-1">{{ $message }}</p>
+@enderror
+```
