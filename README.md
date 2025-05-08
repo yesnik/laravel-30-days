@@ -309,4 +309,64 @@ This button will submit a hidden form:
 </form>
 ```
 
+## 19. Routes Reloaded - 6 Essential Tips
 
+Use model binding in the routes:
+
+```php
+Route::get('/jobs/{job}', function (Job $job) {
+    return view('jobs.show', ['job' => $job]);
+});
+```
+
+We can define that attribute "slug" of a model `Post` is a an ID:
+
+```php
+Route::get('/posts/{post:slug}', function (Post $post) {
+    // ...
+});
+```
+
+Generate controller: `php artisan make:controller`
+
+Add this route to bind URL to a view:
+
+```php
+Route::view('/', 'home');
+```
+
+Console command to list all routes:
+
+```
+php artisan route:list
+php artisan route:list --except-vendor
+```
+
+We can replace these:
+
+```php
+Route::controller(JobController::class)->group(function() {
+    Route::get('/jobs', 'index');
+    Route::get('/jobs/create', 'create');
+    Route::get('/jobs/{job}', 'show');
+    Route::post('/jobs', 'store');
+    Route::get('/jobs/{job}/edit', 'edit');
+    Route::patch('/jobs/{job}', 'update');
+    Route::delete('/jobs/{job}', 'destroy');
+});
+```
+with this:
+
+```php
+Route::resource('jobs', JobController::class);
+
+// We can exclude some actions:
+Route::resource('jobs', JobController::class, [
+    'except' => ['edit']
+]);
+
+// We can define only desired actions:
+Route::resource('jobs', JobController::class, [
+    'only' => ['index', 'show', 'create', 'store']
+]);
+```
