@@ -370,3 +370,18 @@ Route::resource('jobs', JobController::class, [
     'only' => ['index', 'show', 'create', 'store']
 ]);
 ```
+
+## 20. Starter Kits, Breeze, and Middleware
+
+We need Forms:
+
+- Registration
+- Log in
+- Forgot Password
+- Reset Password
+- Profile
+
+To start a new project: `laravel new app`.
+
+Started kits are intended to be used at the start of a new project.
+
