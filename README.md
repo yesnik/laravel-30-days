@@ -385,3 +385,25 @@ To start a new project: `laravel new app`.
 
 Started kits are intended to be used at the start of a new project.
 
+## 21. Make a Login and Registration System From Scratch: Part 1
+
+Make a controller: `php artisan make:controller RegisteredUserController`
+
+Create file for a component `resources\views\components\form-error.blade.php`:
+
+```php
+@props(['name'])
+
+@error($name)
+    <p class="text-xs text-red-500 font-semibold mt-1">{{ $message }}</p>
+@enderror
+```
+
+To show links for guest user:
+
+```php
+@guest
+    <x-nav-link href="/login" :active="request()->is('login')">Log In</x-nav-link>  
+    <x-nav-link href="/register" :active="request()->is('register')">Register</x-nav-link> 
+@endguest
+```
