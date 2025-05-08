@@ -271,3 +271,42 @@ Display validation message for a field:
     <p class="text-xs text-red-500 font-semibold mt-1">{{ $message }}</p>
 @enderror
 ```
+
+## 18. Editing, Updating, and Deleting a Resource
+
+Use this method to throw exception if model not found:
+
+```php
+$job = Job::findOrFail($id);
+```
+
+Update fields of a model:
+
+```php
+$job->update([
+    'title' => request('title'),
+    'salary' => request('salary'),
+]);
+```
+
+We can add to a form `@method('PATCH')`. It will create a hidden input:
+
+```html
+<input type="hidden" name="_method" value="PATCH">
+```
+
+We can add `form` attribute to a button to submit a form with delete action:
+
+```html
+<button form="delete-form" class="text-red-500 text-sm font-bold">Delete</button>
+```
+This button will submit a hidden form:
+
+```html
+<form action="/jobs/{{ $job->id }}" id="delete-form" method="POST" class="hidden">
+  @csrf
+  @method('DELETE')
+</form>
+```
+
+
