@@ -407,3 +407,63 @@ To show links for guest user:
     <x-nav-link href="/register" :active="request()->is('register')">Register</x-nav-link> 
 @endguest
 ```
+
+## 22. Make a Login and Registration System From Scratch: Part 2
+
+Validation for user creation:
+
+```php
+request()->validate([
+    'first_name' => ['required'],
+    'last_name' => ['required'],
+    'email' => ['required', 'email'],
+    'password' => ['required', Password::min(6), 'confirmed'],
+]);
+```
+
+For password Laravel expects that there will be a field `password_confirmation`.
+
+User model has this method:
+
+```php
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+```
+
+It helps to hash password before saving it to the database.
+
+```
+php artisan tinker
+
+> $user = new App\Models\User;
+= App\Models\User {#6197}
+
+> $user->password = '123'
+= "123"
+
+> $user->password
+= "$2y$12$VUtg/dNcXqxuvq0peDeCMubjqMovoMeKalyAVHLicMapxv.dZ.R0G"
+```
+
+We should logout user via POST request:
+
+```html
+@auth
+    <form action="/logout" method="POST">
+    @csrf
+    <x-form-button>Log Out</x-form-button>
+    </form>
+@endauth
+```
+
+We can use old value of a field in the view. Use colon before attribute name - `:value`:
+
+```php
+<x-form-input type="email" name="email" id="email" :value="old('email')" required></x-form-input>
+```
