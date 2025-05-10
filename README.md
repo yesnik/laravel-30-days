@@ -467,3 +467,114 @@ We can use old value of a field in the view. Use colon before attribute name - `
 ```php
 <x-form-input type="email" name="email" id="email" :value="old('email')" required></x-form-input>
 ```
+
+## 23. 6 Steps to Authorization Mastery
+
+We can redirect guest user in edit action in the Controller:
+
+```php
+if (Auth::guest()) {
+    return redirect('/login');
+}
+```
+
+Employer table has column `user_id`, so we can create method at Employer model:
+
+```php
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+```
+
+`$model->is()` determine if 2 models have the save ID and belong to the same table.
+
+```php
+    if ($job->employer->user->isNot(Auth::user())) {
+        abort(403);
+    }
+```
+
+For simple auth cases we can use Gates. Define Gate at the `Providers/AppServiceProvider.php`, in the `boot()` method:
+
+```php
+use Illuminate\Support\Facades\Gate;
+
+Gate::define('edit-job', function(User $user, Job $job) {
+    return $job->employer->user->is($user);
+});
+```
+
+Gate can be used in the view:
+
+```php
+Gate::authorize('edit-job', $job);
+
+if (Gate::denies('edit-job', $job)) {
+    // ...
+}
+```
+
+`$model->can()` determine if the entity has the given ability. In the controller:
+
+```php
+if (Auth::user()->cannot('edit-job', $job)) {
+    dd('failure');
+}
+```
+
+In the `show.blade.php` we can use blade directive:
+
+```php
+@can('edit-job', $job)
+    <p class="mt-6">
+        <x-button href="/jobs/{{ $job->id }}/edit">Edit Job</x-button>
+    </p>
+@endcan
+```
+
+Also we can use authorization on the route level:
+
+```php
+// Way 1
+Route::resource('jobs', JobController::class)->only(['index', 'show']);
+Route::resource('jobs', JobController::class)->except(['index', 'show'])
+    ->middleware('auth');
+
+// Way 2, define middleware for required actions:
+Route::get('/jobs', [JobController::class, 'index']);
+Route::get('/jobs/create', [JobController::class, 'create']);
+Route::post('/jobs', [JobController::class, 'store'])->middleware('auth');
+Route::get('/jobs/{job}', [JobController::class, 'show']);
+
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])
+    ->middleware('auth')
+    ->can('edit-job', 'job');
+
+Route::patch('/jobs/{job}', [JobController::class, 'update']);
+Route::delete('/jobs/{job}', [JobController::class, 'destroy']);
+```
+
+So to edit job you need to be signed in and has permission to edit a job.
+
+Policy is connected to eloquent model. Make a policy: `php artisan make:policy JobPolicy`.
+
+```php
+class JobPolicy
+{
+    public function edit(User $user, Job $job): bool
+    {
+        return $job->employer->user->is($user);
+    }
+}
+```
+
+We can use this policy in the routes file via `can` method:
+
+```php
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])
+    ->middleware('auth')
+    ->can('edit', 'job');
+```
+
+Use policies for most non-trivial applications.
