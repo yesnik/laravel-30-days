@@ -667,4 +667,28 @@ TranslateJob::dispatch();
 
 **Important**: Always restart the worker after making a code change.
 
+## 26. Get Your Build Process in Order
 
+Install NPM dependencies: `npm install`
+
+See Vite config at `vite.config.js`.
+
+Edit `.env`:
+
+```
+APP_URL=http://example.test
+```
+
+Run npm dev command: `npm run dev`
+
+Use `@vite` Laravel directive to include CSS, JS files in the blade template:
+
+```php
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+```
+
+Use Tailwind docs to install it in the Laravel app: https://tailwindcss.com/docs/installation/framework-guides/laravel/vite
+
+If we build a Single Page App we can import only `resources/js/app.js`, where CSS will be also imported.
+
+Run `npm run build` to generate optimized, minified assets for deployment.
