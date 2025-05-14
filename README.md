@@ -632,3 +632,39 @@ To generate absolute URL in the template:
 <a href="{{ url('/jobs/' . $job->id) }}">View Your Job Listing</a>
 ```
 
+## 25. Queues Are Easier Than You Think
+
+Config for queues - `config/queue.php`.
+
+Put email on the queue:
+
+```php
+Mail::to($job->employer->user)->queue(
+    new JobPosted($job)
+);
+```
+Put logging message on the queue with a delay 5 sec:
+
+```php
+dispatch(function() {
+    logger('hello from the queue!');
+})->delay(5);
+```
+
+Run worker that will be processing jobs in a queues: `php artisan queue:work`
+
+Create a class `app/Jobs/TranslateJob.php` for a dedicated job:
+
+```
+php artisan make:job TranslateJob
+```
+
+To dispatch this job:
+
+```php
+TranslateJob::dispatch();
+```
+
+**Important**: Always restart the worker after making a code change.
+
+
