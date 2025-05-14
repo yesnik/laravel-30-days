@@ -578,3 +578,57 @@ Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])
 ```
 
 Use policies for most non-trivial applications.
+
+## 24. How to Preview and Send Email Using Mailable Classes
+
+Generate `app/Mail/JobPosted.php`:
+
+```
+php artisan make:mail JobPosted
+```
+To see our email we can create a test route:
+
+```php
+Route::get('test', function() {
+    return new JobPosted();
+});
+```
+
+To send email:
+
+```php
+Route::get('test', function() {
+    Mail::to('test@gmail.com')->send(
+        new JobPosted()
+    );
+    return 'Done';
+});
+```
+
+On the local PC email message will be logged to a file `storage/logs/laravel.log`.
+
+It's because the default mailer is `log`, see config `config/mail.php`.
+
+`.env` file includes configuration values that may differ based on whether your application
+is running locally or in production.
+
+We can pass variables to mail's template, edit `JobPosted.php`:
+
+```php
+   public function content(): Content
+    {
+        return new Content(
+            view: 'mail.job-posted',
+            with: [
+                'foo' => 'bar',
+                'title' => $this->job->title,
+            ],
+        );
+    }
+```
+
+To generate absolute URL in the template:
+```html
+<a href="{{ url('/jobs/' . $job->id) }}">View Your Job Listing</a>
+```
+
